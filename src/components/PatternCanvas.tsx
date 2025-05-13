@@ -44,10 +44,14 @@ const PatternCanvas = () => {
       // Calculate pattern parameters
       const centerX = canvas.width / 2;
       const centerY = canvas.height / 2;
-      const maxRadius = Math.min(canvas.width, canvas.height) / 2;
+
+      // Calculate the maximum distance from center to any corner
+      const maxDistance = Math.sqrt(
+        Math.pow(canvas.width / 2, 2) + Math.pow(canvas.height / 2, 2),
+      );
 
       // Use spacing to determine the number of rings
-      const maxRings = Math.floor(maxRadius / (spacing * scale));
+      const maxRings = Math.floor(maxDistance / (spacing * scale));
       const ringCount = Math.min(density * complexity, maxRings);
 
       // Draw pattern: multiple rings, each with numShapes
