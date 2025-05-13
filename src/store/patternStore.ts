@@ -1,5 +1,14 @@
 import { create } from 'zustand';
 
+export interface Oscillator {
+  id: string;
+  name: string;
+  targetParameter: keyof PatternParameters;
+  frequency: number;
+  amplitude: number;
+  enabled: boolean;
+}
+
 export interface PatternParameters {
   // Geometric parameters
   shape: 'circle' | 'square' | 'triangle' | 'hexagon';
@@ -23,7 +32,11 @@ export interface PatternParameters {
   numShapes: number;
 }
 
-interface PatternStore extends PatternParameters {
+export interface PatternStore extends PatternParameters {
+  oscillators: Oscillator[];
+  addOscillator: (oscillator: Omit<Oscillator, 'id'>) => void;
+  updateOscillator: (id: string, updates: Partial<Oscillator>) => void;
+  removeOscillator: (id: string) => void;
   setParameter: <K extends keyof PatternParameters>(
     parameter: K,
     value: PatternParameters[K],
@@ -49,6 +62,29 @@ const defaultParameters: PatternParameters = {
 
 export const usePatternStore = create<PatternStore>((set) => ({
   ...defaultParameters,
+  oscillators: [],
+  addOscillator: (oscillator) =>
+    set((state) => ({
+      ...state,
+      oscillators: [
+        ...state.oscillators,
+        { ...oscillator, id: Math.random().toString() },
+      ],
+    })),
+  updateOscillator: (id, updates) =>
+    set((state) => ({
+      ...state,
+      oscillators: state.oscillators.map((oscillator) =>
+        oscillator.id === id ? { ...oscillator, ...updates } : oscillator,
+      ),
+    })),
+  removeOscillator: (id) =>
+    set((state) => ({
+      ...state,
+      oscillators: state.oscillators.filter(
+        (oscillator) => oscillator.id !== id,
+      ),
+    })),
   setParameter: (parameter, value) =>
     set((state) => ({ ...state, [parameter]: value })),
   resetParameters: () => set(defaultParameters),

@@ -1,6 +1,8 @@
 import { motion } from 'framer-motion';
+import { useState } from 'react';
 import { usePatternStore } from '../store/patternStore';
 import type { PatternParameters } from '../store/patternStore';
+import OscillatorControls from './OscillatorControls';
 
 type ControlType = 'select' | 'range' | 'color';
 
@@ -16,6 +18,9 @@ interface Control {
 }
 
 const ControlsPanel = () => {
+  const [activeTab, setActiveTab] = useState<'parameters' | 'oscillators'>(
+    'parameters',
+  );
   const {
     shape,
     size,
@@ -161,44 +166,71 @@ const ControlsPanel = () => {
           </button>
         </div>
 
+        <div className="flex space-x-2 border-b border-white/10">
+          <button
+            onClick={() => setActiveTab('parameters')}
+            className={`px-4 py-2 text-sm font-medium ${
+              activeTab === 'parameters'
+                ? 'text-white border-b-2 border-white'
+                : 'text-white/60 hover:text-white'
+            }`}
+          >
+            Parameters
+          </button>
+          <button
+            onClick={() => setActiveTab('oscillators')}
+            className={`px-4 py-2 text-sm font-medium ${
+              activeTab === 'oscillators'
+                ? 'text-white border-b-2 border-white'
+                : 'text-white/60 hover:text-white'
+            }`}
+          >
+            Oscillators
+          </button>
+        </div>
+
         <div className="space-y-4">
-          {controls.map((control) => (
-            <div key={control.label} className="space-y-2">
-              <label className="block text-sm font-medium text-white">
-                {control.label}
-              </label>
-              {control.type === 'select' ? (
-                <select
-                  value={control.value as string}
-                  onChange={(e) => control.onChange(e.target.value)}
-                  className="w-full bg-white/10 text-white rounded px-3 py-2"
-                >
-                  {control.options?.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-              ) : control.type === 'color' ? (
-                <input
-                  type="color"
-                  value={control.value as string}
-                  onChange={(e) => control.onChange(e.target.value)}
-                  className="w-full h-10 bg-transparent"
-                />
-              ) : (
-                <input
-                  type="range"
-                  value={control.value as number}
-                  min={control.min}
-                  max={control.max}
-                  step={control.step || 1}
-                  onChange={(e) => control.onChange(Number(e.target.value))}
-                  className="w-full"
-                />
-              )}
-            </div>
-          ))}
+          {activeTab === 'parameters' ? (
+            controls.map((control) => (
+              <div key={control.label} className="space-y-2">
+                <label className="block text-sm font-medium text-white">
+                  {control.label}
+                </label>
+                {control.type === 'select' ? (
+                  <select
+                    value={control.value as string}
+                    onChange={(e) => control.onChange(e.target.value)}
+                    className="w-full bg-white/10 text-white rounded px-3 py-2"
+                  >
+                    {control.options?.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                ) : control.type === 'color' ? (
+                  <input
+                    type="color"
+                    value={control.value as string}
+                    onChange={(e) => control.onChange(e.target.value)}
+                    className="w-full h-10 bg-transparent"
+                  />
+                ) : (
+                  <input
+                    type="range"
+                    value={control.value as number}
+                    min={control.min}
+                    max={control.max}
+                    step={control.step || 1}
+                    onChange={(e) => control.onChange(Number(e.target.value))}
+                    className="w-full"
+                  />
+                )}
+              </div>
+            ))
+          ) : (
+            <OscillatorControls />
+          )}
         </div>
       </div>
     </motion.div>
